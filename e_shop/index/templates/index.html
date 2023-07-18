@@ -12,6 +12,15 @@
     <input type="text" name="search_product">
     <button>Поиск</button>
 </form>
+<hr>
+{% for i in product %}
+Товары: <a href="product/{{ i.id }}">{{ i.product_name }}</a>
+{% endfor %}
+<hr>
+{% for i in category %}
+Категории: <a href="category/{{ i.id }}">{{ i.category_name }}</a>
+{% endfor %}
+<hr>
 
 
 
