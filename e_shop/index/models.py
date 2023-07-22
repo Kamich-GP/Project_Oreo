@@ -14,7 +14,7 @@ class Product(models.Model):
     product_name = models.CharField(max_length=512)
     product_desc = models.TextField(blank=True)
     product_price = models.FloatField()
-    product_photo = models.ImageField(upload_to='media')
+    product_photo = models.ImageField()
     product_amount = models.IntegerField()
     product_category = models.ForeignKey(Category, on_delete=models.CASCADE)
     added_time = models.DateTimeField(auto_now_add=True)

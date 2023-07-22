@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from . import forms
 from .models import *
+from .handlers import bot
 
 # Create your views here.
 def home_page(request):
@@ -22,6 +23,11 @@ def home_page(request):
 
 def product_page(request, pk):
     product_info = Product.objects.get(id=pk)
+
+    if request.method == "POST":
+        Cart.objects.create(user_id=request.user.id,
+                            user_product=product_info,
+                            user_product_amount=request.POST.get('product_amount'))
 
     #Передаем данные на фронт
     context = {'product': product_info}
@@ -45,6 +51,35 @@ def search_product(request):
         except:
             return redirect('/')
 
+def register(request):
+    if request.method == 'POST':
+        form = forms.RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+        return redirect('/')
+    else:
+        form = forms.RegisterForm()
+
+    return render(request, 'registration/register.html', {'form': form})
+
+def get_user_cart(request):
+    user_cart = Cart.objects.filter(user_id=request.user.id)
+
+    if request.method == 'POST':
+        main_text = 'Новый заказ!\n\n'
+
+        for i in user_cart:
+            main_text += f'Товар: {i.user_product}\nКоличество: {i.user_product_amount}'
+
+        bot.send_message(791555605, main_text)
+        user_cart.delete()
+        return redirect('/')
+    return render(request, 'user_cart.html', {'cart': user_cart})
+
+def del_from_cart(request, pk):
+    cart = Cart.objects.filter(user_id=request.user.id, user_product=pk)
+    cart.delete()
+    return redirect('/')
 
 def about_page(request):
     return render(request, 'about.html')
